@@ -1,0 +1,5 @@
+{
+  "name": "DC Motor",
+  "author": "Jean Lesly Jocelyn",
+"pins": ["VCC", "GND"]
+}
