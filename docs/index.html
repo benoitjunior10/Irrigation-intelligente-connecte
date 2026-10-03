@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Irrigation intelligente connectée</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mqtt@5.10.1/dist/mqtt.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+    <h1>Irrigation intelligente connectée</h1>
+    <div class="bar">
+        <span id="status" class="badge">Connexion…</span>
+        <span id="age" class="badge">Aucune donnée</span>
+        <button id="demoBtn" type="button" title="Affiche des données simulées pour tester la page">Mode démo</button>
+    </div>
+</header>
+
+<div id="banner" role="status" aria-live="polite"><b id="bTitle">En attente des données</b><span id="bText">Lance la simulation Wokwi : les mesures apparaîtront ici.</span></div>
+<main>
+    <section>
+        <h2>Humidité du sol</h2>
+        <p class="hint">Mesurée par le capteur de sol (simulé par un potentiomètre).</p>
+        <div class="tank" role="img" aria-label="Niveau d'humidité du sol">
+            <div class="fill" id="fill"></div>
+            <div class="mark" style="bottom:50%">50 % : la pompe s'arrête</div>
+            <div class="mark" style="bottom:30%">30 % : la pompe démarre</div>
+            <div class="big"><b id="soil">--</b><span>%</span></div>
+        </div>
+        <div class="pump" id="pump">Pompe : en attente</div>
+    </section>
+
+    <div class="right">
+        <section>
+            <h2>Contrôle de la pompe</h2>
+            <p class="hint">Automatique : l'ESP32 décide selon les seuils. Manuel : tu commandes la pompe.</p>
+            <div class="ctl">
+                <div class="seg" role="group" aria-label="Mode"><button id="mAuto" type="button">Automatique</button><button id="mMan" type="button">Manuel</button></div>
+                <button id="bOn" class="go" type="button">Arroser</button>
+                <button id="bOff" class="stop" type="button">Arrêter</button>
+            </div>
+            <p class="hint" id="ctlMsg" style="margin:10px 0 0"></p>
+        </section>
+
+        <section>
+            <h2>Air ambiant</h2>
+            <p class="hint">Mesuré par le capteur DHT22. Ces valeurs sont affichées et publiées, elles ne commandent pas la pompe.</p>
+            <div class="kpis">
+                <div class="kpi"><b id="temp">--</b> °C<small>Température de l'air</small></div>
+                <div class="kpi"><b id="air">--</b> %<small>Humidité de l'air</small></div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Évolution de l'humidité du sol</h2>
+            <p class="hint">Les 60 dernières mesures (une toutes les 2 secondes).</p>
+            <canvas id="chart"></canvas>
+            <div class="legend"><span><i style="border-top:3px solid var(--water)"></i>Humidité du sol</span><span><i style="border-top:2px dashed var(--soil)"></i>Seuils 30 % et 50 %</span></div>
+        </section>
+
+        <section>
+            <div class="bar" style="justify-content:space-between">
+                <h2>Historique des arrosages</h2>
+                <button id="clearBtn" type="button">Effacer l'historique</button>
+            </div>
+            <p class="hint">Chaque ligne est un arrosage terminé : de l'allumage à l'arrêt de la pompe.</p>
+            <p id="sum"></p>
+            <div class="tw"><table>
+                <thead><tr><th>Début</th><th>Fin</th><th>Durée</th><th>Mode</th><th>Sol (début → fin)</th><th>Arrêt</th></tr></thead>
+                <tbody id="rows"></tbody>
+            </table></div>
+            <div class="empty" id="empty">Aucun arrosage enregistré. Une ligne apparaît dès que la pompe s'arrête.</div>
+        </section>
+    </div>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>

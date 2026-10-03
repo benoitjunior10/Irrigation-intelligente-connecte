@@ -1,0 +1,386 @@
+/* Variables de couleurs */
+:root{
+    --bg:#E8EEE3;
+    --panel:#F7FAF4;
+    --ink:#14281F;
+    --mute:#4F6357;
+    --line:#C9D5C4;
+    --water:#1E6FD9;
+    --water-soft:#BBD5F5;
+    --soil:#7B4A2B;
+    --ok:#2F7D4F;
+    --ok-soft:#CFE8D6;
+    --warn:#9A6A00;
+    --warn-soft:#F6E3B0;
+    --idle:#E1E6DE
+}
+
+/* Mode sombre
+Adapte automatiquement les couleurs au thème du système. */
+@media (prefers-color-scheme:dark){
+    :root{--bg:#0F1B15;
+    --panel:#172921;
+    --ink:#E4EEE6;
+    --mute:#9DB1A4;
+    --line:#2A4034;
+    --water:#5AA0FF;
+    --water-soft:#1D3A5F;
+    --soil:#C08A62;
+    --ok:#6CCB92;
+    --ok-soft:#1B4030;
+    --warn:#F0C25A;
+    --warn-soft:#4A3B12;
+    --idle:#22352B}
+}
+
+/* Reglage generaux
+Facilite le calcul des dimensions de tous les éléments. */
+*{
+    box-sizing:border-box
+}
+
+body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Bricolage Grotesque",system-ui,sans-serif;
+    line-height:1.45
+}
+
+header{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    align-items:center;
+    justify-content:space-between;
+    padding:20px clamp(16px,4vw,40px) 12px
+}
+
+/* En-tete
+Titre, état MQTT, âge des donnees et bouton du mode démo. */
+
+h1{
+    margin:0;
+    font-size:clamp(1.3rem,3vw,1.9rem);
+    font-weight:800;
+    letter-spacing:-.01em
+}
+
+.bar{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    flex-wrap:wrap
+}
+
+/* Badges d'état affichés dans l'en-tête. */
+.badge{
+    padding:6px 12px;
+    border-radius:99px;
+    border:1px solid var(--line);
+    background:var(--panel);font-size:.9rem
+}
+.badge.ok{
+    color:var(--ok);
+    border-color:var(--ok)
+}
+.badge.demo{
+    color:var(--soil);
+    border-color:var(--soil)
+}
+
+/* Style commun des boutons du tableau de bord. */
+button{
+    font:inherit;
+    padding:6px 14px;
+    border-radius:8px;
+    border:1px solid var(--line);
+    background:var(--panel);
+    color:var(--ink);
+    cursor:pointer
+}
+
+button:hover{
+    border-color:var(--ink)
+}
+button:focus-visible{
+    outline:3px solid var(--water);
+    outline-offset:2px
+}
+
+/* Banniere D'etat
+Informe l'utilisateur sur l'état du sol et de la pompe. */
+
+#banner{
+    margin:0 clamp(16px,4vw,40px) 20px;
+    padding:18px 22px;
+    border-radius:14px;
+    background:var(--idle);
+    border:1px solid var(--line)
+}
+
+#banner b{
+    display:block;
+    font-size:clamp(1.2rem,3vw,1.7rem);
+    font-weight:800
+}
+
+#banner span{
+    color:var(--mute)
+}
+
+#banner.good{
+    background:var(--ok-soft);
+    border-color:var(--ok)
+}
+
+#banner.watch{
+    background:var(--warn-soft);
+    border-color:var(--warn)
+}
+
+#banner.pump{
+    background:var(--water-soft);
+    border-color:var(--water)
+}
+
+/* 
+Mise en page principale
+Deux colonnes sur grand écran, une colonne sur mobile. */
+main{
+    display:grid;
+    grid-template-columns:minmax(260px,340px) 1fr;
+    gap:20px;
+    padding:0 clamp(16px,4vw,40px) 40px
+}
+
+@media (max-width:760px){
+    main{
+        grid-template-columns:1fr
+    }
+}
+
+/* Cartes contenant chaque partie du tableau de bord. */
+section{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:14px;padding:20px
+}
+
+h2{
+    margin:0 0 4px;
+    font-size:1.1rem;
+    font-weight:600
+}
+
+.hint{
+    margin:0 0 14px;
+    color:var(--mute);
+    font-size:.9rem
+}
+
+/* JAUGE D'HUMIDITÉ DU SOL
+La hauteur du remplissage est mise à jour en JavaScript. */
+
+.tank{
+    position:relative;
+    height:340px;
+    border:3px solid var(--soil);
+    border-top-width:0;
+    border-radius:0 0 18px 18px;
+    overflow:hidden
+}
+
+.fill{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    height:0%;
+    background:var(--water-soft);
+    border-top:3px solid var(--water);
+    transition:height .8s ease
+}
+
+.big{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    pointer-events:none
+}
+
+.big b{
+    font-size:4.2rem;
+    font-weight:800;
+    line-height:1
+}
+
+.big span{
+    color:var(--mute)
+}
+
+.mark{
+    position:absolute;
+    left:0;
+    right:0;
+    border-top:2px dashed var(--soil);
+    font-size:.78rem;
+    color:var(--soil);
+    padding:2px 8px
+}
+
+/* Indicateur visuel de l'état de la pompe. */
+.pump{
+    margin-top:16px;
+    padding:12px 14px;
+    border-radius:10px;
+    font-weight:600;
+    border:1px solid var(--line)
+}
+
+.pump.on{
+    background:var(--water);
+    color:#fff;
+    border-color:var(--water)
+}
+
+/* Colonne de droite : contrôles, mesures, graphique, historique. */
+.right{
+    display:grid;
+    gap:20px;
+    align-content:start
+}
+
+
+/* Mesures de température et d'humidité de l'air. */
+.kpis{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+    gap:20px
+}
+
+.kpi b{
+    font-size:2.3rem;
+    font-weight:800
+}
+
+.kpi small{
+    display:block;
+    color:var(--mute)
+}
+
+/* Zone de dessin du graphique d'humidité du sol. */
+canvas{
+    width:100%;
+    height:170px;
+    display:block
+}
+
+/* Légende affichée sous le graphique. */
+.legend{
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+    font-size:.85rem;
+    color:var(--mute);
+    margin-top:8px
+}
+
+.legend i{
+    display:inline-block;
+    width:22px;
+    height:0;
+    vertical-align:middle;
+    margin-right:6px
+}
+
+/* HISTORIQUE
+   Autorise le défilement horizontal du tableau sur mobile. */
+.tw{
+    overflow-x:auto
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:.95rem
+}
+
+th,td{
+    text-align:left;
+    padding:8px 10px;
+    border-bottom:1px solid var(--line);
+    white-space:nowrap
+}
+    
+th{color:var(--mute);
+    font-weight:600
+}
+
+.empty{
+    color:var(--mute);
+    padding:12px 0
+}
+
+#sum{
+    font-weight:600;
+    margin:0 0 10px
+}
+
+/* Apparence utilisée lors d'un arrêt de sécurité. */
+#banner.alert{
+    background:#F5D0C8;
+    border-color:#B3341F
+}
+
+@media (prefers-color-scheme:dark){
+    #banner.alert{
+        background:#5A231A;
+        border-color:#FF8A73
+    }
+}
+
+/* CONTRÔLES DE LA POMPE
+   Choix Auto/Manuel et boutons Arroser/Arrêter. */
+.ctl{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center
+}
+
+.seg{
+    display:inline-flex;
+    border:1px solid var(--line);
+    border-radius:8px;
+    overflow:hidden
+}
+
+.seg button{
+    border:0;
+    border-radius:0
+}
+
+.seg button.act{
+    background:var(--water);
+    color:#fff
+}
+
+/* Bouton de démarrage manuel de l'arrosage. */
+button:disabled{
+    opacity:.45;
+    cursor:not-allowed
+}
+
+.go{background:var(--water);
+    color:#fff;
+    border-color:var(--water)
+}
+
+/* Bouton d'arrêt manuel de l'arrosage. */
+.stop{
+    border-color:#B3341F
+}
